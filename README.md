@@ -25,8 +25,8 @@ The app stores match data in a local SQLite database, lets you manage saved acco
 Clone this repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-cd YOUR_REPO_NAME
+git clone https://github.com/c4ppuccino-monkey/IP-MAN-buff.git
+cd IP-MAN-buff
 ```
 
 Create and activate a virtual environment:
