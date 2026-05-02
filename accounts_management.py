@@ -63,14 +63,20 @@ def add_account(accounts_list):
 
 def remove_account(account_id):
     """Remove an account ID from the list and save it."""
-    accounts_list = load_accounts()
-    if account_id not in accounts_list:
-        print(f"Account ID {account_id} not found.")
-        return
+    accounts = load_accounts()
+    account_id = str(account_id).strip()
+
+    updated_accounts = []
+
+    for acc in accounts:
+        if str(acc["id"]) != account_id:
+            updated_accounts.append(acc)
+
+    if len(updated_accounts) == len(accounts):
+        return False
     
-    accounts_list.remove(account_id)
-    save_accounts(accounts_list)
-    print(f"Account ID {account_id} removed successfully.")
+    save_accounts(updated_accounts)
+    return True
 
 
 def choose_account():
