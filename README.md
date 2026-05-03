@@ -50,22 +50,16 @@ pip install -r requirements.txt
 
 ## Account Setup
 
-Create a local `accounts.json` file in the project root:
+Accounts are managed inside the app. You do not need to create or edit
+`accounts.json` by hand.
 
-```json
-{
-    "accounts": [
-        {
-            "name": "example_player",
-            "id": "123456789"
-        }
-    ]
-}
-```
+1. Start the Streamlit app.
+2. Open **Database Management** from the sidebar.
+3. Add a display name and Dota account ID.
+4. Use **Update match history** to fetch and ingest matches for the selected accounts.
 
-Replace the example values with your own Dota account IDs.
-
-`accounts.json` is ignored by Git because it is local user configuration.
+The app creates and updates `accounts.json` automatically. The file is ignored by
+Git because it is local user configuration.
 
 ## Running The App
 
@@ -87,10 +81,16 @@ The database is created automatically when needed.
 
 Use the database management page to:
 
-- add accounts of interest
-- fetch new match IDs for saved accounts
-- request parsing from OpenDota
-- ingest selected matches into the local database
+- add or remove saved accounts
+- update match history for one or more accounts
+- fetch new match IDs from OpenDota
+- load basic match details into the local database
+- optionally load detailed parsed stats
+- optionally request missing parsed data from OpenDota
+
+The normal flow is to choose accounts, set a match limit, and click
+**Update match history**. Advanced queue details are available in the page if you
+want to inspect which matches still need basic or detailed data.
 
 OpenDota has API limits, so large parsing or ingestion runs should be done gradually.
 

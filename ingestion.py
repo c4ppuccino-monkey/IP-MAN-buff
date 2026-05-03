@@ -113,16 +113,93 @@ def select_matches(cur, limit=100, unparsed_pop=None,
     return selected
 
 
+def select_matches_for_accounts(cur, account_ids, limit=100, unparsed_pop=None,
+                                parsed_pop=None, version=None):
+    """Select queued match IDs scoped to one or more saved accounts."""
+    if not account_ids:
+        return []
+
+    placeholders = ", ".join(["?"] * len(account_ids))
+    query = f"""SELECT DISTINCT pm.match_id
+        FROM player_matches pm
+        JOIN account_matches am
+            ON am.match_id = pm.match_id
+        WHERE am.account_id IN ({placeholders})
+    """
+    params = list(account_ids)
+
+    if unparsed_pop is not None:
+        query += " AND pm.unparsed_pop = ?"
+        params.append(unparsed_pop)
+
+    if parsed_pop is not None:
+        query += " AND pm.parsed_pop = ?"
+        params.append(parsed_pop)
+
+    if version is not None:
+        if version == "null":
+            query += " AND pm.version IS NULL"
+        else:
+            query += " AND pm.version = ?"
+            params.append(version)
+
+    query += " ORDER BY pm.start_time DESC, pm.match_id DESC LIMIT ?"
+    params.append(limit)
+
+    cur.execute(query, params)
+
+    selected = []
+    for n in cur.fetchall():
+        selected.append(n[0])
+
+    return selected
+
+
+def queue_counts_for_accounts(cur, account_ids):
+    """Return simple ingestion queue counts scoped to saved accounts."""
+    if not account_ids:
+        return {
+            "known": 0,
+            "needs_basic": 0,
+            "needs_details": 0,
+            "complete": 0,
+        }
+
+    placeholders = ", ".join(["?"] * len(account_ids))
+    cur.execute(
+        f"""SELECT DISTINCT pm.match_id, pm.unparsed_pop, pm.parsed_pop
+            FROM player_matches pm
+            JOIN account_matches am
+                ON am.match_id = pm.match_id
+            WHERE am.account_id IN ({placeholders})
+        """,
+        list(account_ids),
+    )
+
+    rows = cur.fetchall()
+    return {
+        "known": len(rows),
+        "needs_basic": sum(1 for row in rows if row[1] == 0),
+        "needs_details": sum(1 for row in rows if row[1] == 1 and row[2] == 0),
+        "complete": sum(1 for row in rows if row[1] == 1 and row[2] == 1),
+    }
+
+
 def main_pop(cur, conn, matches_ids, unparsed_pop,
-             heroes_map, abilities_map):
+             heroes_map, abilities_map, include_parsed=True,
+             progress_callback=None):
     
     """Drive unparsed+parsed ingestion for all requested match IDs."""
 
     total_matches = len(matches_ids)
+    processed_matches = 0
     print(f"A total of {total_matches} matches will be processed")
 
     for match_id in matches_ids:
         try:
+            if progress_callback:
+                progress_callback(processed_matches, total_matches, match_id)
+
             url = f"https://api.opendota.com/api/matches/{match_id}"
             r = fetch_json(url)
 
@@ -138,12 +215,19 @@ def main_pop(cur, conn, matches_ids, unparsed_pop,
 
             if parsed and unparsed_pop in (0, None):
                 popul.pop_unparsed(r, match_id, cur, conn)
-                popul.pop_all_parsed(r, match_id, cur, conn)
-                logger.info("Populated unparsed+parsed rows. match_id=%s", match_id)
+                if include_parsed:
+                    popul.pop_all_parsed(r, match_id, cur, conn)
+                    logger.info(
+                        "Populated unparsed+parsed rows. match_id=%s",
+                        match_id,
+                    )
+                else:
+                    logger.info("Populated unparsed rows only. match_id=%s", match_id)
             
             elif parsed and unparsed_pop == 1:
-                popul.pop_all_parsed(r, match_id, cur, conn)
-                logger.info("Populated parsed rows only. match_id=%s", match_id)
+                if include_parsed:
+                    popul.pop_all_parsed(r, match_id, cur, conn)
+                    logger.info("Populated parsed rows only. match_id=%s", match_id)
 
             elif not parsed and unparsed_pop == 1:
                 continue
@@ -157,6 +241,7 @@ def main_pop(cur, conn, matches_ids, unparsed_pop,
             logger.exception("Failed to ingest match payload. match_id=%s", match_id)
 
         total_matches -= 1
+        processed_matches += 1
         print(f"\nMatches remaining: {total_matches}\n")
 
         time.sleep(1)  # Limiting api calls to 60 per minute

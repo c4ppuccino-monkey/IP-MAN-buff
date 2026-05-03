@@ -2,10 +2,23 @@ import os
 import sqlite3
 
 
+def get_database_path():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_dir, "data_base", "database.db")
+
+
+def get_database_version():
+    """Return a lightweight value that changes whenever SQLite is updated."""
+    db_path = get_database_path()
+    if not os.path.exists(db_path):
+        return 0
+
+    return os.path.getmtime(db_path)
+
+
 # Connecting to the databse
 def get_connection():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(base_dir, "data_base", "database.db")
+    db_path = get_database_path()
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row

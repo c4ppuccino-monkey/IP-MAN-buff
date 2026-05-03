@@ -25,6 +25,13 @@ st.set_page_config(layout="wide")
 
 st.title("Dota Dashboard")
 
+db_version = queries.get_database_version()
+st.caption(f"Database updated: {pd.to_datetime(db_version, unit='s'):%Y-%m-%d %H:%M:%S}")
+
+if st.button("Refresh dashboard data"):
+    st.cache_data.clear()
+    st.rerun()
+
 compare = st.toggle("Compare accounts", key="compare_accounts")
 
 # Filters
@@ -43,8 +50,9 @@ hero_filter = filters["hero_filter"]
 @st.cache_data(show_spinner=True)
 def load_match_rows(
     account_id, result_filter, matches_filter, peer_id,
-    parse_filter, item, first_item, second_item
+    parse_filter, item, first_item, second_item, database_version
 ):
+    _ = database_version
     local_conn = queries.get_connection()
     local_cur = local_conn.cursor()
     rows = queries.get_matches_by_account(
@@ -124,7 +132,7 @@ def data_per_account(account_id, account_name):
 
     df = pd.DataFrame(load_match_rows(
         account_id, result_filter, matches_filter, peer_id,
-        parse_filter, item, first_item, second_item
+        parse_filter, item, first_item, second_item, db_version
     ))
 
     if df.empty:
@@ -274,7 +282,7 @@ def singel_account_dashboard(account):
 
     df = pd.DataFrame(load_match_rows(
         account_id, result_filter, matches_filter, peer_id,
-        parse_filter, item, first_item, second_item
+        parse_filter, item, first_item, second_item, db_version
     ))
 
     if df.empty:
