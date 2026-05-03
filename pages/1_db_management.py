@@ -7,9 +7,11 @@ import db_population as popul
 import ingestion
 import opendota_client
 import maps
+import streamlit_bootstrap
 
 
 st.set_page_config(layout="wide")
+streamlit_bootstrap.require_dotaconstants()
 
 st.title("Database Management")
 

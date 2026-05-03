@@ -5,6 +5,27 @@ from pathlib import Path
 
 repo_path = Path("dotaconstants")
 json_dir = repo_path/"build"
+required_constant_files = [
+    "heroes.json",
+    "items.json",
+    "hero_abilities.json",
+]
+
+
+def missing_constant_files():
+    """Return required dotaconstants JSON files that are not available locally."""
+    missing = []
+    for filename in required_constant_files:
+        path = json_dir / filename
+        if not path.exists():
+            missing.append(str(path))
+
+    return missing
+
+
+def constants_available():
+    """Return True when the Streamlit app can load the required Dota constants."""
+    return not missing_constant_files()
 
 # Load hero constants
 def load_heroes():
@@ -149,5 +170,4 @@ def get_item_name(p, items_map):
             names.append(items_map.get(str(slot), None))
 
     return names
-
 

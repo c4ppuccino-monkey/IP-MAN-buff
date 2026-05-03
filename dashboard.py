@@ -7,7 +7,11 @@ import enrichment as en
 import app_functions as af
 import maps
 import comparison_charts
+import streamlit_bootstrap
 
+
+st.set_page_config(layout="wide")
+streamlit_bootstrap.require_dotaconstants()
 
 # Loading the database and creating a cursor
 conn = queries.get_connection()
@@ -20,8 +24,6 @@ heroes_dicts = maps.load_heroes()
 heroes_names = af.heroes_names_list(heroes_dicts)
 items_dicts = maps.load_items()
 items = af.items_options_list(items_dicts)
-
-st.set_page_config(layout="wide")
 
 st.title("Dota Dashboard")
 

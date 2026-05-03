@@ -106,6 +106,12 @@ def sync_repo():
 
     try:
         if not (path / ".git").exists():
+            if path.exists():
+                raise RuntimeError(
+                    "dotaconstants/ exists but is not a Git checkout. "
+                    "Rename or remove that folder, then try again."
+                )
+
             logger.info("Cloning dotaconstants repository.")
             subprocess.run(
                 ["git", "clone", 

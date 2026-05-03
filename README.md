@@ -69,6 +69,9 @@ Start the Streamlit dashboard:
 streamlit run dashboard.py
 ```
 
+On a fresh install, the app may show a **Download Dota constants** button. Click
+it once to download OpenDota's local hero, item, and ability metadata.
+
 The app uses a local SQLite database at:
 
 ```text

@@ -10,19 +10,19 @@ import cli_menu
 accounts = am.load_accounts()
 accounts_ids = am.get_accounts_ids(accounts)
 
-# Load constant maps used for enrichment
-heroes_map = maps.load_heroes()
-abilities_map = maps.load_hero_abilities()
-maps.load_items()
-maps.load_ancients()
-maps.load_aghs_desc()
-maps.load_order_types()
-maps.load_perma_buffs()
-print("loaded maps")
-
 def main():
     
     opendota_client.sync_repo()
+
+    # Load constant maps used for enrichment
+    heroes_map = maps.load_heroes()
+    abilities_map = maps.load_hero_abilities()
+    maps.load_items()
+    maps.load_ancients()
+    maps.load_aghs_desc()
+    maps.load_order_types()
+    maps.load_perma_buffs()
+    print("loaded maps")
 
     api_calls_remaining = 2000  # Number of free calls per day
 
