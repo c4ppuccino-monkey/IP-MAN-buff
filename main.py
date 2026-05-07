@@ -8,7 +8,6 @@ import accounts_management as am
 import cli_menu
 
 accounts = am.load_accounts()
-accounts_ids = am.get_accounts_ids(accounts)
 
 def main():
     
@@ -42,13 +41,26 @@ def main():
             conn, cur = table.create_database()
             print("created database connection")
 
-            for account_id in accounts_ids:
+            for account in accounts:
+                account_id = account["id"]
+                account_name = account["name"]
                 logger.info(
                     "Starting ingestion run. account_id=%s",
                     account_id)
 
                 # Fetch and select matches to ingest
-                all_matches = opendota_client.fetch_matches(account_id)
+                try:
+                    all_matches = opendota_client.fetch_matches(account_id)
+                except Exception:
+                    logger.exception(
+                        "Could not refresh matches for account_id=%s",
+                        account_id,
+                    )
+                    print(
+                        f"Could not refresh matches for {account_name} "
+                        f"({account_id}). Using existing database data."
+                    )
+                    continue
 
                 known_matches = ingestion.check_match_id(cur)
                 all_matches_ids = ingestion.get_match_id(all_matches)
@@ -63,14 +75,12 @@ def main():
 
                 popul.populate_base_table(all_matches, account_id, cur, conn)
                 print(f"{len(new_ids)} matches were added for {account_id}\n"
-                      f"Account name: ")
+                      f"Account name: {account_name}")
 
             cli_menu.menu(cur, conn, heroes_map, abilities_map)
 
         except Exception:
-            logger.exception(
-                "Fatal error during ingestion run. account_id=%s", 
-                account_id)
+            logger.exception("Fatal error during ingestion run.")
             raise
         finally:
             if conn is not None:

@@ -103,9 +103,10 @@ def increment_match_retries(cur, conn, match_id: int) -> None:
 def sync_repo():
     """Sync local constants repository used for static Dota metadata."""
     path = Path("dotaconstants")
+    repo_exists = (path / ".git").exists()
 
     try:
-        if not (path / ".git").exists():
+        if not repo_exists:
             if path.exists():
                 raise RuntimeError(
                     "dotaconstants/ exists but is not a Git checkout. "
@@ -125,6 +126,12 @@ def sync_repo():
 
     except subprocess.CalledProcessError as e:
         logger.error("Failed to sync dotaconstants repository: %s", e)
+        if repo_exists:
+            logger.warning(
+                "Using existing local dotaconstants data because refresh failed."
+            )
+            return
+
         raise RuntimeError(
             "Git command failed. " \
             "Ensure Git is installed and accessible.")   
