@@ -7,9 +7,15 @@ from logging_config import configure_logging, get_logger
 import accounts_management as am
 import cli_menu
 
-accounts = am.load_accounts()
 
 def main():
+
+    accounts = am.load_accounts()
+
+    while not accounts:
+        print("No saved accounts found")
+        am.add_account(accounts)
+        accounts = am.load_accounts()
     
     opendota_client.sync_repo()
 

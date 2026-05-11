@@ -2,7 +2,10 @@
 
 This is a small Python app for collecting Dota 2 match data from OpenDota, saving it into a local SQLite database, and viewing simple stats in a Streamlit dashboard.
 
-## What `main.py` Does
+## Accounts
+You can add ypur steam account name and ID in the accounts JSON
+
+## Database population
 
 `main.py` is the command-line entry point for the app.
 
