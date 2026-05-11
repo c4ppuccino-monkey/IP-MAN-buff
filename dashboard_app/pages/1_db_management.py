@@ -7,7 +7,7 @@ import db_population as popul
 import ingestion
 import opendota_client
 import maps
-import streamlit_bootstrap
+from dashboard_app import streamlit_bootstrap
 
 
 st.set_page_config(layout="wide")
