@@ -91,7 +91,7 @@ The Streamlit dashboard reads from the same SQLite database.
 Run it with:
 
 ```bash
-streamlit run dashboard_app/dashboard.py
+streamlit run dashboard.py
 ```
 
 The main dashboard lets you:
@@ -105,10 +105,4 @@ The main dashboard lets you:
 - view benchmark percentiles when parsed benchmark data is available
 - see charts for hero distribution, rolling win rate, farming over time, KDA over time, and damage vs net worth
 
-There is also a database management page:
-
-```bash
-streamlit run dashboard_app/pages/1_db_management.py
-```
-
-That page lets you add/remove saved accounts, update match history, load basic details, load detailed stats, request missing OpenDota parses, and preview ingestion queue counts.
+There is also a database management page in the Streamlit sidebar. That page lets you add/remove saved accounts, update match history, load basic details, load detailed stats, request missing OpenDota parses, and preview ingestion queue counts.

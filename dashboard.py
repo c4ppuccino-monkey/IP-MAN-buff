@@ -6,8 +6,8 @@ import accounts_management as am
 import enrichment as en
 import app_functions as af
 import maps
-from dashboard_app.charts import comparison_charts
-from dashboard_app import streamlit_bootstrap
+import comparison_charts
+import streamlit_bootstrap
 
 
 st.set_page_config(layout="wide")
