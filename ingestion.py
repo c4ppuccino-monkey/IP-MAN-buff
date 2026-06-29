@@ -6,6 +6,7 @@ from logging_config import get_logger
 from opendota_client import fetch_json
 import time
 
+api_key = "9e48ca3c-18d5-4bba-a6ed-71ab841b3d2f"
 
 logger = get_logger(__name__)
 
@@ -200,7 +201,7 @@ def main_pop(cur, conn, matches_ids, unparsed_pop,
             if progress_callback:
                 progress_callback(processed_matches, total_matches, match_id)
 
-            url = f"https://api.opendota.com/api/matches/{match_id}"
+            url = f"https://api.opendota.com/api/matches/{match_id}?api_key={api_key}"
             r = fetch_json(url)
 
             parsed = r.get("od_data", {}).get("has_parsed")
@@ -244,6 +245,6 @@ def main_pop(cur, conn, matches_ids, unparsed_pop,
         processed_matches += 1
         print(f"\nMatches remaining: {total_matches}\n")
 
-        time.sleep(1)  # Limiting api calls to 60 per minute
+        time.sleep(0.05)  # Limiting api calls to 60 per minute
 
     
