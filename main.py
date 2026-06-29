@@ -7,6 +7,7 @@ from logging_config import configure_logging, get_logger
 import accounts_management as am
 import cli_menu
 
+# I love Anwar
 
 def main():
 
