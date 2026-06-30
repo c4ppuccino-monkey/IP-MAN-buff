@@ -18,9 +18,7 @@ env/
 accounts.json
 
 # Local SQLite databases and runtime data
-data_base/*.db
-data_base/*.sqlite
-data_base/*.sqlite3
+data_base/
 
 # Logs
 logs/*.log
