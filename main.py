@@ -8,7 +8,7 @@ import accounts_management as am
 import cli_menu
 
 # I love Anwar
-# I hate Amber
+# I hate Amber fool
 
 def main():
 
